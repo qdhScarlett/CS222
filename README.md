@@ -1,6 +1,6 @@
 # GCN-LPA
 
-This repository is the implementation of GCN-LPA ([arXiv](https://arxiv.org/abs/2002.06755)):
+This repository is the implementation of the first part of GCN-LPA ([arXiv](https://arxiv.org/abs/2002.06755)):
 > Unifying Graph Convolutional Neural Networks and Label Propagation  
 > Hongwei Wang, Jure Leskovec  
 > arXiv Preprint, 2020
