@@ -22,6 +22,8 @@ def print_statistics(features, labels, adj):
     print('n_labels: %d' % n_labels)
     print('labeled node rate: %.4f' % labeled_node_rate)
     print('intra-class edge rate: %.4f' % intra_class_edge_rate)
+    print(labels)
+    print(adj)
 
 
 def train(args, data, batch_test=False):
@@ -29,8 +31,9 @@ def train(args, data, batch_test=False):
 
     # uncomment the next line if you want to print statistics of the current dataset
     # print_statistics(features, labels, adj)
+    print(train_mask)
 
-    model = LPA(args, features, labels, adj)
+    model = LPA(args, features, labels, train_mask, adj)
 
     def get_feed_dict(mask, dropout):
         feed_dict = {model.label_mask: mask, model.dropout: dropout}
@@ -43,11 +46,14 @@ def train(args, data, batch_test=False):
         final_test_acc = 0
         for epoch in range(args.epochs):
             # train
-            _, train_loss, train_acc = sess.run(
-                [model.optimizer, model.loss, model.accuracy], feed_dict=get_feed_dict(train_mask, args.dropout))
+            _, train_loss, train_acc, train_weight = sess.run(
+                [model.optimizer, model.loss, model.accuracy, model.adj], feed_dict=get_feed_dict(train_mask, args.dropout))
+            #print(train_weight)
 
             # validation
-            val_loss, val_acc = sess.run([model.loss, model.accuracy], feed_dict=get_feed_dict(val_mask, 0.0))
+            val_loss, val_acc, val_weight = sess.run([model.loss, model.accuracy,model.adj], feed_dict=get_feed_dict(val_mask, 0.0))
+            #print(val_weight)
+            #exit()
 
             # test
             test_loss, test_acc = sess.run([model.loss, model.accuracy], feed_dict=get_feed_dict(test_mask, 0.0))
