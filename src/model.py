@@ -88,9 +88,10 @@ class GCN_LPA(object):
         self.accuracy = tf.reduce_sum(correct_prediction * self.label_mask) / tf.reduce_sum(self.label_mask)
 
 class LPA(object):
-    def __init__(self, args, features, labels, adj):
+    def __init__(self, args, features, labels, train_mask, adj):
         self.args = args
         self.vars = []  # for computing l2 loss
+        self.train_mask=train_mask
 
         self._build_inputs(features, labels)
         self._build_edges(adj)
@@ -102,17 +103,17 @@ class LPA(object):
     def _build_inputs(self, features, labels):
         self.features = tf.SparseTensor(*features)
         self.labels = tf.constant(labels, dtype=tf.float64)
-        self.label_mask = tf.placeholder(tf.float64, shape=labels.shape[0])
+        self.label_mask = tf.placeholder(tf.float64, shape=labels.shape[0]) #用feed_dict输入
         self.dropout = tf.placeholder(tf.float64)
 
     def _build_edges(self, adj):
-        edge_weights = glorot(shape=[adj[0].shape[0]])
+        edge_weights = glorot(shape=[adj[0].shape[0]])  #
         self.adj = tf.SparseTensor(adj[0], edge_weights, adj[2])
         self.normalized_adj = tf.sparse_softmax(self.adj)
         self.vars.append(edge_weights)
 
     def _build_lpa(self):
-        label_mask = tf.expand_dims(self.label_mask, -1)
+        label_mask = tf.expand_dims(self.train_mask, -1)
         input_labels = label_mask * self.labels
         label_list = [input_labels]
 
