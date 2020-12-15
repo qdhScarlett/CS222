@@ -131,11 +131,11 @@ class LPA(object):
         # LPA loss
         lpa_loss = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.predicted_label, labels=self.labels)
         lpa_loss = tf.reduce_sum(lpa_loss * self.label_mask) / tf.reduce_sum(self.label_mask)
-        self.loss =  lpa_loss
+        self.loss =  self.args.lpa_weight * lpa_loss
 
         # L2 loss
-        #for var in self.vars:
-            #self.loss += self.args.l2_weight * tf.nn.l2_loss(var)
+        for var in self.vars:
+            self.loss += self.args.l2_weight * tf.nn.l2_loss(var)
 
         self.optimizer = tf.train.AdamOptimizer(learning_rate=self.args.lr).minimize(self.loss)
 
