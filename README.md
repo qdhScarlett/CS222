@@ -20,6 +20,9 @@ GCN-LPA is an end-to-end model that unifies Graph Convolutional Neural Networks 
 - `src/`: implementation of GCN-LPA.
 
 
+### Sparsification Algorithms of unweighted/weighted Graph
+> Graph Sparsification by Effective Resistances, Daniel A. Spielman, Nikhil Srivastava, 2009.
+> A Unifying Framework for Spectrum-Preserving Graph Sparsification and Coarsening, Gecia Bravo-Hermsdorff, Lee M. Gunderson, 2020.
 
 
 ### Running the code
