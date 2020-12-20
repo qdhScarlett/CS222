@@ -1,6 +1,7 @@
 import numpy as np
-import tensorflow as tf
-from model import GCN_LPA,LPA
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+from model import GCN_LPA,LPA,GCN
 
 
 def print_statistics(features, labels, adj):
@@ -26,7 +27,7 @@ def print_statistics(features, labels, adj):
     print(adj)
 
 
-def train(args, data, batch_test=False):
+def train_LPA(args, data, batch_test=False):
     features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
 
     # uncomment the next line if you want to print statistics of the current dataset
@@ -34,6 +35,7 @@ def train(args, data, batch_test=False):
     print(train_mask)
 
     model = LPA(args, features, labels, train_mask, adj)
+    #model = GCN_LPA(args, features, labels, adj)
 
     def get_feed_dict(mask, dropout):
         feed_dict = {model.label_mask: mask, model.dropout: dropout}
@@ -70,3 +72,54 @@ def train(args, data, batch_test=False):
             print('final test acc: %.4f' % final_test_acc)
         else:
             return final_test_acc
+    return train_weight
+
+
+
+def train_GCN(args, data, batch_test=False):
+    features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
+
+    # uncomment the next line if you want to print statistics of the current dataset
+    # print_statistics(features, labels, adj)
+    print(adj)
+
+    model = GCN(args,features, labels,adj)
+    #model = GCN_LPA(args, features, labels, adj)
+
+    def get_feed_dict(mask, dropout):
+        feed_dict = {model.label_mask: mask, model.dropout: dropout}
+        return feed_dict
+
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+
+        best_val_acc = 0
+        final_test_acc = 0
+        for epoch in range(args.epochs):
+            # train
+            _, train_loss, train_acc, train_weight = sess.run(
+                [model.optimizer, model.loss, model.accuracy, model.adj], feed_dict=get_feed_dict(train_mask, args.dropout))
+            #print(train_weight)
+
+            # validation
+            val_loss, val_acc, val_weight = sess.run([model.loss, model.accuracy,model.adj], feed_dict=get_feed_dict(val_mask, 0.0))
+            #print(val_weight)
+            #exit()
+
+            # test
+            test_loss, test_acc = sess.run([model.loss, model.accuracy], feed_dict=get_feed_dict(test_mask, 0.0))
+
+            if val_acc >= best_val_acc:
+                best_val_acc = val_acc
+                final_test_acc = test_acc
+
+            if not batch_test:
+                print('epoch %d   train loss: %.4f  acc: %.4f   val loss: %.4f  acc: %.4f   test loss: %.4f  acc: %.4f'
+                      % (epoch, train_loss, train_acc, val_loss, val_acc, test_loss, test_acc))
+
+        if not batch_test:
+            print('final test acc: %.4f' % final_test_acc)
+        else:
+            return final_test_acc
+
+

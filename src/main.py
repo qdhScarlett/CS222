@@ -4,7 +4,7 @@ import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 from time import time
 from data_loader import load_data, load_npz, load_random
-from train import train
+from train import train_LPA,train_GCN
 from graph_reduction import reduction
 from spectral_sparisifcation import spectral_sparsify
 import numpy as np
@@ -99,38 +99,52 @@ t = time()
 args = parser.parse_args()
 
 if args.dataset in ['cora', 'citeseer', 'pubmed']:
-    data = load_data(args.dataset)
-
-
+    data = list(load_data(args.dataset))
+    print(type(data))
 
 elif args.dataset in ['coauthor-cs', 'coauthor-phy']:
-    data = load_npz(args.dataset)
+    data = list(load_npz(args.dataset))
 else:
     n_nodes = 1000
-    data = load_random(n_nodes=n_nodes, n_train=100, n_val=200, p=10/n_nodes)
+    data = list(load_random(n_nodes=n_nodes, n_train=100, n_val=200, p=10/n_nodes))
 
-print("adj\n", data[2])
-print("data[2][0]\n",len(data[2][0]))
-print("data[2][1][0]\n",data[2][1])
-
-# print("data[2][1][0]\n",(data[2][1][0]))
-# print("data[2][1][1]\n",data[2][1][1])
-
-#"method1"
-sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,data[2][0],data[2][1])  #10240:target number of edges
-data[2][0] = sp_edges #update edge data
-data[2][1] = sp_weights  #update weights data
-print("sp_edges",sp_edges)
-print("sp_weights",sp_weights)
-
-#"method2"
-A = sp.coo_matrix((data[2][1],(list(data[2][0].T[0]), list(data[2][0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
-A = A.tocsr()
-A = A + A.T
-B = spectral_sparsify(A, epsilon=3e-1, log_every=100, convergence_after=100, eta=1e-6, max_iters=100000, prevent_vertex_blow_up=True)
-print(f'Sparsified graph has {B.nnz} edges.')
+features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
 
 
-train(args, data)
+LPA_weight = train_LPA(args, data)
 print('time used: %d s' % (time() - t))
-#features, labels, adj, train_mask, val_mask, test_mask
+print(LPA_weight)
+
+#----------------"method1"---------------------#
+# sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,data[2][0],data[2][1])  #10240:target number of edges
+# print("sp_edges",sp_edges)
+# print("sp_weights",sp_weights)
+# adj = list(data[2])
+# print(type(adj))
+# adj[0] = sp_edges
+# adj[1] = sp_weights
+#adj = tuple(adj)
+#----------------"method1"---------------------#
+
+
+#----------------"method2"---------------------#
+# A = sp.coo_matrix((data[2][1],(list(data[2][0].T[0]), list(data[2][0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
+# A = A.tocsr()
+# A = A + A.T
+# B = spectral_sparsify(A, epsilon=2e-1, log_every=100, convergence_after=100, eta=1.5e-5, max_iters=1000, prevent_vertex_blow_up=True)
+# print(f'Sparsified graph has {B.nnz} edges.')
+# rows, cols = B.nonzero()
+# weights = np.array(B[rows, cols].tolist())
+# #print(weights)
+# print(type(adj))
+# adj = list(data[2])
+# print(type(adj))
+# adj[0] = np.array([rows,cols]).T
+# adj[1] = weights
+# #----------------"method2"---------------------#
+#
+#
+#
+# data = list([features,labels,adj,train_mask, val_mask, test_mask])
+
+train_GCN(args, data)
