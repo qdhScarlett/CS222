@@ -30,7 +30,6 @@ parser.add_argument('--lpa_weight', type=float, default=10, help='weight of LP r
 parser.add_argument('--dropout', type=float, default=0.2, help='dropout rate')
 parser.add_argument('--lr', type=float, default=0.05, help='learning rate')
 '''
-
 # citeseer
 parser.add_argument('--dataset', type=str, default='citeseer', help='which dataset to use')
 parser.add_argument('--epochs', type=int, default=200, help='the number of epochs')
@@ -41,8 +40,6 @@ parser.add_argument('--l2_weight', type=float, default=5e-4, help='weight of l2 
 parser.add_argument('--lpa_weight', type=float, default=1, help='weight of LP regularization')
 parser.add_argument('--dropout', type=float, default=0, help='dropout rate')
 parser.add_argument('--lr', type=float, default=0.2, help='learning rate')
-
-
 # pubmed
 parser.add_argument('--dataset', type=str, default='pubmed', help='which dataset to use')
 parser.add_argument('--epochs', type=int, default=200, help='the number of epochs')
@@ -133,12 +130,12 @@ print("LPA_adj[0].T[1])",LPA_adj[0].T[1])
 
 
 #----------------"method2"---------------------#
-#LPA_adj[1]:edge weights; LPA_adj[0]：edges; LPA_adj[0].T[0] and LPA_adj[0].T[1]: endpoint sets of edges
+##LPA_adj[1]:edge weights; LPA_adj[0]：edges; LPA_adj[0].T[0] and LPA_adj[0].T[1]: endpoint sets of edges
 A = sp.coo_matrix((np.abs(LPA_adj[1]),(list(LPA_adj[0].T[0]), list(LPA_adj[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
 A = A.tocsr()
 A = A + A.T
 print("A",A)
-B = spectral_sparsify(A, epsilon=2e-2, log_every=100, convergence_after=100, eta=1.2e-4, max_iters=100000, prevent_vertex_blow_up=True)
+B = spectral_sparsify(A, epsilon=2e-2, log_every=100, convergence_after=100, eta=1.2e-5, max_iters=100000, prevent_vertex_blow_up=True)
 print(f'Sparsified graph has {B.nnz} edges.')
 rows, cols = B.nonzero()
 weights = np.array(B[rows, cols].tolist())
