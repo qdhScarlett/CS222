@@ -114,42 +114,42 @@ features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range
 LPA_weight = train_LPA(args, data)
 # print("type",type(LPA_weight))
 # print('time used: %d s' % (time() - t))
-# print(LPA_weight[0])
-print(type(LPA_weight))
-# print(LPA_weight[1])
-# print("LPA_weight[0].T[0])",LPA_weight[0].T[0])
+print("LPA_weight",LPA_weight)
+print("Type LPA_weight",type(LPA_weight))
+print("LPA_weight[0]",LPA_weight[0])
+print("Type LPA_weight[0]",type(LPA_weight[0]))
+print("LPA_weight[1]",LPA_weight[1])
+print("Type LPA_weight[1]",type(LPA_weight[1]))
+print("LPA_weight[0].T[0])",LPA_weight[0].T[0])
+print("LPA_weight[0].T[1])",LPA_weight[0].T[1])
 
 #----------------"method1"---------------------#
 # sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_weight[0],LPA_weight[1])  #10240:target number of edges
 # print("sp_edges",sp_edges)
 # print("sp_weights",sp_weights)
-# adj = list(data[2])
-# print(type(adj))
-# adj[0] = sp_edges
-# adj[1] = sp_weights
+# SP_adj = tf.SparseTensor(indices = sp_edges,values = sp_weights,dense_shape=[2708, 2708])
+# print(SP_adj)
+# print(type(SP_adj))
 #----------------"method1"---------------------#
 
 
 #----------------"method2"---------------------#
-# A = sp.coo_matrix((LPA_weight[1],(list(LPA_weight[0].T[0]), list(LPA_weight[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
-# A = A.tocsr()
-# A = A + A.T
-# B = spectral_sparsify(A, epsilon=2e-1, log_every=100, convergence_after=100, eta=1.5e-5, max_iters=1000, prevent_vertex_blow_up=True)
-# print(f'Sparsified graph has {B.nnz} edges.')
-# rows, cols = B.nonzero()
-# weights = np.array(B[rows, cols].tolist())
-# #print(weights)
-# print(type(adj))
-# adj = list(data[2])
-# print(type(adj))
-# adj[0] = np.array([rows,cols]).T
-# adj[1] = weights
+A = sp.coo_matrix((np.abs(LPA_weight[1]),(list(LPA_weight[0].T[0]), list(LPA_weight[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
+A = A.tocsr()
+A = A + A.T
+print("A",A)
+B = spectral_sparsify(A, epsilon=2e-1, log_every=100, convergence_after=100, eta=1.5e-5, max_iters=100000, prevent_vertex_blow_up=True)
+print(f'Sparsified graph has {B.nnz} edges.')
+rows, cols = B.nonzero()
+weights = np.array(B[rows, cols].tolist())
+sp_edges = np.array([rows,cols]).T
+#print(weights)
+print("Sp_weights",weights[0])
+print("Type_Sp_weights",type(weights))
+print("sp_edges",np.array([rows,cols]).T)
+SP_adj = tf.SparseTensor(indices = sp_edges,values = weights[0],dense_shape=[2708, 2708])
+print(SP_adj)
+print(type(SP_adj))
 # #----------------"method2"---------------------#
-#
-#
-# data = list([features,labels,adj,train_mask, val_mask, test_mask])
-# print("typeData[2]",type(data[2]))
 
-#train_GCN(args, data)
-
-train_GCN(args, features, labels, LPA_weight, train_mask, val_mask, test_mask)
+train_GCN(args, features, labels, SP_adj, train_mask, val_mask, test_mask)

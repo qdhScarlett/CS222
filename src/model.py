@@ -107,7 +107,7 @@ class LPA(object):
         self.dropout = tf.placeholder(tf.float64)
 
     def _build_edges(self, adj):
-        edge_weights = glorot(shape=[adj[0].shape[0]])  #
+        edge_weights = glorot(shape=[adj[0].shape[0]])
         self.adj = tf.SparseTensor(adj[0], edge_weights, adj[2])
         self.normalized_adj = tf.sparse_softmax(self.adj)
         self.vars.append(edge_weights)
@@ -162,7 +162,7 @@ class GCN(object):
         self.dropout = tf.placeholder(tf.float64)
 
     def _build_edges(self, adj):
-        self.adj = tf.SparseTensor(*adj)
+        self.adj = adj
         self.normalized_adj = tf.sparse_softmax(self.adj)
 
     def _build_gcn(self, feature_dim, label_dim, feature_nnz):
