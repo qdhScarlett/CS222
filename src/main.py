@@ -111,20 +111,19 @@ else:
 
 features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
 
-LPA_weight = train_LPA(args, data)
-# print("type",type(LPA_weight))
-# print('time used: %d s' % (time() - t))
-print("LPA_weight",LPA_weight)
-print("Type LPA_weight",type(LPA_weight))
-print("LPA_weight[0]",LPA_weight[0])
-print("Type LPA_weight[0]",type(LPA_weight[0]))
-print("LPA_weight[1]",LPA_weight[1])
-print("Type LPA_weight[1]",type(LPA_weight[1]))
-print("LPA_weight[0].T[0])",LPA_weight[0].T[0])
-print("LPA_weight[0].T[1])",LPA_weight[0].T[1])
+LPA_adj = train_LPA(args, data)
+
+print("LPA_adj",LPA_adj)
+print("LPA_adj[0]",LPA_adj[0])
+print("Type LPA_adj[0]",type(LPA_adj[0]))
+print("LPA_adj[1]",LPA_adj[1])
+print("Type LPA_adj[1]",type(LPA_adj[1]))
+print("LPA_adj[0].T[0])",LPA_adj[0].T[0])
+print("LPA_adj[0].T[1])",LPA_adj[0].T[1])
 
 #----------------"method1"---------------------#
-# sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_weight[0],LPA_weight[1])  #10240:target number of edges
+# sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_weight[0],LPA_weight[1])
+# #10240:target number of edges
 # print("sp_edges",sp_edges)
 # print("sp_weights",sp_weights)
 # SP_adj = tf.SparseTensor(indices = sp_edges,values = sp_weights,dense_shape=[2708, 2708])
@@ -134,11 +133,12 @@ print("LPA_weight[0].T[1])",LPA_weight[0].T[1])
 
 
 #----------------"method2"---------------------#
-A = sp.coo_matrix((np.abs(LPA_weight[1]),(list(LPA_weight[0].T[0]), list(LPA_weight[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
+#LPA_adj[1]:edge weights; LPA_adj[0]：edges; LPA_adj[0].T[0] and LPA_adj[0].T[1]: endpoint sets of edges
+A = sp.coo_matrix((np.abs(LPA_adj[1]),(list(LPA_adj[0].T[0]), list(LPA_adj[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
 A = A.tocsr()
 A = A + A.T
 print("A",A)
-B = spectral_sparsify(A, epsilon=2e-1, log_every=100, convergence_after=100, eta=1.5e-5, max_iters=100000, prevent_vertex_blow_up=True)
+B = spectral_sparsify(A, epsilon=2e-2, log_every=100, convergence_after=100, eta=1.2e-4, max_iters=100000, prevent_vertex_blow_up=True)
 print(f'Sparsified graph has {B.nnz} edges.')
 rows, cols = B.nonzero()
 weights = np.array(B[rows, cols].tolist())
