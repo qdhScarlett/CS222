@@ -162,7 +162,7 @@ class GCN(object):
         self.dropout = tf.placeholder(tf.float64)
 
     def _build_edges(self, adj):
-        self.adj = adj
+        self.adj = tf.SparseTensor(*adj)
         self.normalized_adj = tf.sparse_softmax(self.adj)
 
     def _build_gcn(self, feature_dim, label_dim, feature_nnz):
