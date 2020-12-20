@@ -109,12 +109,15 @@ else:
     n_nodes = 1000
     data = list(load_random(n_nodes=n_nodes, n_train=100, n_val=200, p=10/n_nodes))
 
-# features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
+features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
 
-# LPA_weight = train_LPA(args, data)
+LPA_weight = train_LPA(args, data)
+# print("type",type(LPA_weight))
 # print('time used: %d s' % (time() - t))
 # print(LPA_weight[0])
+print(type(LPA_weight))
 # print(LPA_weight[1])
+# print("LPA_weight[0].T[0])",LPA_weight[0].T[0])
 
 #----------------"method1"---------------------#
 # sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_weight[0],LPA_weight[1])  #10240:target number of edges
@@ -145,5 +148,8 @@ else:
 #
 #
 # data = list([features,labels,adj,train_mask, val_mask, test_mask])
+# print("typeData[2]",type(data[2]))
 
-train_GCN(args, data)
+#train_GCN(args, data)
+
+train_GCN(args, features, labels, LPA_weight, train_mask, val_mask, test_mask)

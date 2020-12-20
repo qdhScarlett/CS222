@@ -76,13 +76,8 @@ def train_LPA(args, data, batch_test=False):
 
 
 
-def train_GCN(args, data, batch_test=False):
-    features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
-
-    # uncomment the next line if you want to print statistics of the current dataset
-    # print_statistics(features, labels, adj)
-    print(adj)
-
+def train_GCN(args, features, labels, adj, train_mask, val_mask, test_mask, batch_test=False):
+    #features, labels, adj, train_mask, val_mask, test_mask = [data[i] for i in range(6)]
     model = GCN(args,features, labels,adj)
     #model = GCN_LPA(args, features, labels, adj)
 
