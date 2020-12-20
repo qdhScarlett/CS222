@@ -122,7 +122,7 @@ print("LPA_adj[0].T[0])",LPA_adj[0].T[0])
 print("LPA_adj[0].T[1])",LPA_adj[0].T[1])
 
 #----------------"method1"---------------------#
-# sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_weight[0],LPA_weight[1])
+# sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_adj[0],LPA_adj[1])
 # #10240:target number of edges
 # print("sp_edges",sp_edges)
 # print("sp_weights",sp_weights)
