@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow as tf
 from time import time
 from data_loader import load_data, load_npz, load_random
 from train import train_LPA,train_GCN
@@ -21,7 +20,7 @@ parser = argparse.ArgumentParser()
 
 # cora
 parser.add_argument('--dataset', type=str, default='cora', help='which dataset to use')
-parser.add_argument('--epochs', type=int, default=2000, help='the number of epochs')
+parser.add_argument('--epochs', type=int, default=200, help='the number of epochs')
 parser.add_argument('--dim', type=int, default=32, help='dimension of hidden layers')
 parser.add_argument('--gcn_layer', type=int, default=5, help='number of GCN layers')
 parser.add_argument('--lpa_iter', type=int, default=5, help='number of LPA iterations')
@@ -118,6 +117,8 @@ print("Type LPA_adj[1]",type(LPA_adj[1]))
 print("LPA_adj[0].T[0])",LPA_adj[0].T[0])
 print("LPA_adj[0].T[1])",LPA_adj[0].T[1])
 
+
+
 #----------------"method1"---------------------#
 # sp_edges,sp_weights = reduction('edges','delete','all',1.0/8,1.0/4,10240,False,False,LPA_adj[0],LPA_adj[1])
 # #10240:target number of edges
@@ -131,11 +132,16 @@ print("LPA_adj[0].T[1])",LPA_adj[0].T[1])
 
 #----------------"method2"---------------------#
 ##LPA_adj[1]:edge weights; LPA_adj[0]：edges; LPA_adj[0].T[0] and LPA_adj[0].T[1]: endpoint sets of edges
-A = sp.coo_matrix((np.abs(LPA_adj[1]),(list(LPA_adj[0].T[0]), list(LPA_adj[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
+
+normalized_weight =np.array(LPA_adj[1])
+normalized_weight=normalized_weight-np.min(normalized_weight)
+normalized_weight=normalized_weight/np.max(normalized_weight)
+
+A = sp.coo_matrix((np.abs(normalized_weight),(list(LPA_adj[0].T[0]), list(LPA_adj[0].T[1]))),shape=[2708, 2708])  #2708:size of nodes
 A = A.tocsr()
 A = A + A.T
 print("A",A)
-B = spectral_sparsify(A, epsilon=2e-2, log_every=100, convergence_after=100, eta=1.2e-5, max_iters=100000, prevent_vertex_blow_up=True)
+B = spectral_sparsify(A, q = None,epsilon=2e-2, log_every=100, convergence_after=100, eta=1.2e-5, max_iters=100000, prevent_vertex_blow_up=True)
 print(f'Sparsified graph has {B.nnz} edges.')
 rows, cols = B.nonzero()
 weights = np.array(B[rows, cols].tolist())
