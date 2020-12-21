@@ -118,7 +118,7 @@ normalized_weight =np.array(LPA_adj[1])
 normalized_weight=normalized_weight-np.min(normalized_weight)
 normalized_weight=normalized_weight/np.max(normalized_weight)
 
-for i in range(3000):
+for i in range(len(adj[0])//7):
     a=random.randint(0,labels.shape[1]-1)
     np.delete(edge_pair,a,0)
     np.delete(normalized_weight,a,None) 
