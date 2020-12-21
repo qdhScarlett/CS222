@@ -114,12 +114,12 @@ normalized_weight =np.array(LPA_adj[1])
 normalized_weight=normalized_weight-np.min(normalized_weight)
 normalized_weight=normalized_weight/np.max(normalized_weight)
 
-for i in range(3000):
+for i in range(len(adj[0])//7):
     a=random.randint(0,2707)
     np.delete(edge_pair,a,0)
     np.delete(normalized_weight,a,None) 
 print(edge_pair,normalized_weight)
-SP_adj = tf.SparseTensor(indices = edge_pair.astype(np.float64),values = normalized_weight.astype(np.float64),dense_shape=[2708, 2708])
+SP_adj = tf.SparseTensor(indices = edge_pair.astype(np.float64),values = normalized_weight.astype(np.float64),dense_shape=[[features[2][0], features[2][0]]])
 
 
 train_GCN(args, features, labels, SP_adj, train_mask, val_mask, test_mask)
