@@ -1,4 +1,4 @@
-### LER
+# LER
 
 This repository is the implementation of our project of SJTU-CS222 Algorithm Design & Analysis:
 > LER：Spectral Data Augmentation for Graph Neural Network 
