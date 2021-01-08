@@ -1,12 +1,12 @@
-# GCN-LPA
+### LER
 
-This repository is the implementation of the first part of GCN-LPA ([arXiv](https://arxiv.org/abs/2002.06755)):
-> Unifying Graph Convolutional Neural Networks and Label Propagation  
-> Hongwei Wang, Jure Leskovec  
-> arXiv Preprint, 2020
+This repository is the implementation of our project of SJTU-CS222 Algorithm Design & Analysis:
+> LER：Spectral Data Augmentation for Graph Neural Network 
+> Wenyi Xue, Sijia Li, Luyuan Jin  
 
 
-GCN-LPA is an end-to-end model that unifies Graph Convolutional Neural Networks (GCN) and Label Propagation Algorithm (LPA) for adaptive semi-supervised node classification.
+### learnable LPA
+Use the first part of GCN-LPA, an end-to-end model that unifies Graph Convolutional Neural Networks (GCN) and Label Propagation Algorithm (LPA) for adaptive semi-supervised node classification, proposed by Hongwei Wang and Jure Leskovec in the paper <Unifying Graph Convolutional Neural Networks and Label Propagation>.
 
 
 ### Files in the folder
@@ -17,7 +17,7 @@ GCN-LPA is an end-to-end model that unifies Graph Convolutional Neural Networks 
   - `pubmed/`
   - `ms_academic_cs.npz` (Coauthor-CS)
   - `ms_academic_phy.npz` (Coauthor-Phy)
-- `src/`: implementation of GCN-LPA.
+- `src/`: implementation of LER.
 
 
 ### Sparsification Algorithms of unweighted/weighted Graph
